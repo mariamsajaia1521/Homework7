@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Glass Gallery</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animation.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="is-loading">
+
+    <div class="page-loader" id="pageLoader">
+        <span class="loader-mark" aria-hidden="true"></span>
+        <p class="loader-text">Loading Gallery</p>
+    </div>
+
+    <div class="ambient-bg">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <header class="gallery-header">
+        <div class="header-inner">
+            <div class="header-title-block">
+                <h1>ART<span>GALLERY</span></h1>
+                <p class="header-sub">Discover the World's Most Iconic Paintings</p>
+            </div>
+            <button class="music-btn" id="musicBtn" type="button">&#9835; Play Music</button>
+        </div>
+    </header>
+
+    <main class="gallery-shell">
+        <section class="gallery-lane" aria-label="Featured paintings">
+            <div class="marquee-container">
+                <div class="marquee-track track-ltr" data-track="cyan"></div>
+            </div>
+        </section>
+
+        <section class="gallery-lane" aria-label="Classic paintings">
+            <div class="marquee-container">
+                <div class="marquee-track track-rtl" data-track="magenta"></div>
+            </div>
+        </section>
+    </main>
+
+    <section class="faq-section" id="faq">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <button class="faq-question">What is Cyber-Glass Gallery?<span class="faq-icon">+</span></button>
+                <div class="faq-answer"><p>Cyber-Glass Gallery is a curated digital exhibition that presents some of the world's most iconic paintings inside a modern, immersive interface inspired by neon light and glass surfaces.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How do I view painting details?<span class="faq-icon">+</span></button>
+                <div class="faq-answer"><p>Click any artwork card to open a larger preview with the artist's name, date, and a short historical background about the painting.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Can I play or pause the background music?<span class="faq-icon">+</span></button>
+                <div class="faq-answer"><p>Yes. Use the <strong>&#9835; Play Music</strong> button in the top-right corner to start or pause the soundtrack whenever you like.</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Will more artworks be added later?<span class="faq-icon">+</span></button>
+                <div class="faq-answer"><p>Absolutely. The gallery is designed to grow over time, making it easy to expand the collection with new masterpieces and richer stories.</p></div>
+            </div>
+        </div>
+    </section>
+
+    
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose" type="button">&#10005;</button>
+            <div class="modal-body">
+                <div class="modal-image-wrap" id="modalImageWrap">
+                    <img id="modalImg" src="" alt="">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modalTitle"></h2>
+                    <p class="modal-artist" id="modalArtist"></p>
+                    <p class="modal-year" id="modalYear"></p>
+                    <div class="modal-divider" id="modalDivider"></div>
+                    <p class="modal-history" id="modalHistory"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto" src="audio/Beethoven - Moonlight Sonata (FULL).mp3"></audio>
+
+    <script>
+    const TRACKS = {
+        cyan: ['monaLisa', 'starryNight', 'scream', 'persistence', 'theKiss'],
+        magenta: ['nightWatch', 'guernica', 'arnolfini', 'sunflowers', 'waterLilies']
+    };
+
+    const PAINTINGS = {
+        monaLisa:      { src:'images/mona-lisa.png',          title:'Mona Lisa',                   accent:'cyan',    artist:'Leonardo da Vinci',  year:'1503–1519',    history:'Painted in Florence between 1503 and 1519, the Mona Lisa is arguably the most famous artwork ever created. The subject is believed to be Lisa Gherardini, wife of Florentine merchant Francesco del Giocondo. Leonardo employed his pioneering sfumato technique to achieve an ethereal realism unprecedented at the time. Napoleon later hung it in his bedroom. Today it resides in the Louvre, Paris, behind bulletproof glass.' },
+        starryNight:   { src:'images/starry-night.png',       title:'The Starry Night',             accent:'cyan',    artist:'Vincent van Gogh',   year:'1889',         history:'Painted in June 1889 from the window of his room at the Saint-Paul-de-Mausole asylum, The Starry Night captures a swirling nocturnal sky over a village. Van Gogh wrote to his brother Theo that he needed to paint the night more intensely than the day. The cypress tree symbolises both death and eternity. Donated to MoMA in New York in 1941.' },
+        scream:        { src:'images/scream.png',              title:'The Scream',                   accent:'cyan',    artist:'Edvard Munch',        year:'1893',         history:'Munch created The Scream in 1893, inspired by a moment when the sky turned blood-red at sunset and he felt "an infinite scream passing through nature." It exists in four versions and has become the defining image of existential anxiety in modern art. It is housed at the National Museum in Oslo, Norway.' },
+        persistence:   { src:'images/persistence-memory.png', title:'The Persistence of Memory',    accent:'cyan',    artist:'Salvador Dalí',      year:'1931',         history:'Dalí painted this small 24 × 33 cm masterpiece in just a few hours in 1931, reportedly inspired by a piece of melting Camembert cheese. The drooping, melting watches challenge our conventional understanding of time. The cliffs in the background are those of Cap de Creus in Catalonia. It entered the MoMA collection in 1934.' },
+        theKiss:       { src:'images/the-kiss.png',           title:'The Kiss',                     accent:'cyan',    artist:'Gustav Klimt',       year:'1907–1908',    history:'Painted at the height of Klimt\'s "Golden Phase," The Kiss is a defining work of the Vienna Secession movement. Two figures wrapped in a shimmering cloak of genuine gold leaf embrace at the edge of a flower-covered cliff. Klimt was inspired by Byzantine mosaics he saw in Ravenna. Permanently housed in the Österreichische Galerie Belvedere, Vienna.' },
+        nightWatch:    { src:'images/night-watch.png',        title:'The Night Watch',              accent:'magenta', artist:'Rembrandt van Rijn', year:'1642',         history:'At 363 × 437 cm, The Night Watch is a colossal group portrait of a city militia company led by Captain Frans Banninck Cocq. Rembrandt revolutionised the genre by showing the figures in dynamic motion with dramatic chiaroscuro. On display in the Rijksmuseum, Amsterdam since 1808. It has been attacked three times: slashed in 1911, doused in acid in 1975, and slashed again in 1990.' },
+        guernica:      { src:'images/guernica.png',           title:'Guernica',                     accent:'magenta', artist:'Pablo Picasso',      year:'1937',         history:'Picasso created this monumental 349 × 776 cm oil painting in response to the Nazi bombing of the Basque town of Guernica on 26 April 1937. Completed in just over a month, it depicts the suffering of people and animals in grey, black, and white. Picasso refused to allow it to return to Spain while Franco was in power. It now resides in the Museo Reina Sofía, Madrid.' },
+        arnolfini:     { src:'images/arnolfini.png',          title:'The Arnolfini Portrait',       accent:'magenta', artist:'Jan van Eyck',      year:'1434',         history:'The Arnolfini Portrait (1434) is a double portrait believed to depict Giovanni di Nicolao Arnolfini and his wife in their home in Bruges. The painting is celebrated for its extraordinary technical virtuosity, particularly the convex mirror in the background. The inscription "Johannes de Eyck fuit hic 1434" serves as both signature and witness. Housed in the National Gallery, London.' },
+        sunflowers:    { src:'images/sunflowers.png',         title:'Sunflowers',                   accent:'magenta', artist:'Vincent van Gogh',  year:'1888',         history:'Van Gogh painted several versions of Sunflowers in Arles in August 1888 to decorate the Yellow House for his friend Paul Gauguin. The works are celebrated for their bold, flat style and intense yellows — colours van Gogh associated with friendship and gratitude. One version sold at Christie\'s in 1987 for £24.75 million, then a world record.' },
+        waterLilies:   { src:'images/water-lilies.png',       title:'Water Lilies',                 accent:'magenta', artist:'Claude Monet',       year:'1914–1926',    history:'Monet\'s Water Lilies (Nymphéas) is a series of approximately 250 oil paintings depicting his flower garden at Giverny. They were the main focus of his artistic production during the last thirty years of his life. Many of the works were painted while Monet suffered from cataracts.' }
+    };
+
+    function createCard(key, painting) {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `glass-card ${painting.accent}-card`;
+        card.dataset.key = key;
+        card.setAttribute('aria-label', `${painting.title} by ${painting.artist}`);
+        card.innerHTML = `
+            <img class="card-image" src="${painting.src}" alt="${painting.title}" loading="lazy" decoding="async">
+            <span class="card-copy">
+                <span class="card-title">${painting.title}</span>
+                <span class="card-sub ${painting.accent}">${painting.artist}</span>
+                <span class="card-sub ${painting.accent}">${painting.year}</span>
+            </span>
+        `;
+
+        const image = card.querySelector('.card-image');
+        const markLoaded = () => image.classList.add('is-loaded');
+        if (image.complete) {
+            markLoaded();
+        } else {
+            image.addEventListener('load', markLoaded, { once: true });
+        }
+
+        card.addEventListener('click', () => openModal(key));
+        return card;
+    }
+
+    function populateTracks() {
+        document.querySelectorAll('.marquee-track').forEach(track => {
+            const trackName = track.dataset.track;
+            const keys = TRACKS[trackName] || [];
+
+            keys.forEach(key => {
+                track.appendChild(createCard(key, PAINTINGS[key]));
+            });
+
+            keys.forEach(key => {
+                const clone = createCard(key, PAINTINGS[key]);
+                clone.tabIndex = -1;
+                clone.setAttribute('aria-hidden', 'true');
+                track.appendChild(clone);
+            });
+        });
+    }
+
+    function setTrackDistance(track) {
+        const cards = Array.from(track.children);
+        const midpoint = cards.length / 2;
+        if (!cards.length || !Number.isInteger(midpoint) || !cards[midpoint]) return;
+
+        const loopDistance = cards[midpoint].offsetLeft - cards[0].offsetLeft;
+        track.style.setProperty('--loop-distance', `${loopDistance}px`);
+        track.classList.add('is-ready');
+    }
+
+    function refreshTrackDistances() {
+        document.querySelectorAll('.marquee-track').forEach(setTrackDistance);
+    }
+
+    function openModal(key) {
+        const p = PAINTINGS[key]; if (!p) return;
+        const color = p.accent === 'cyan' ? '#00f3ff' : '#ff00ff';
+        document.getElementById('modalImg').src                      = p.src;
+        document.getElementById('modalImg').alt                      = p.title;
+        document.getElementById('modalImageWrap').style.borderColor  = color;
+        document.getElementById('modalTitle').textContent            = p.title;
+        document.getElementById('modalTitle').style.color            = color;
+        document.getElementById('modalArtist').textContent           = p.artist;
+        document.getElementById('modalYear').textContent             = p.year;
+        document.getElementById('modalYear').style.color             = color;
+        document.getElementById('modalDivider').style.background     = color;
+        document.getElementById('modalHistory').textContent          = p.history;
+        document.getElementById('modalClose').style.color            = color;
+        document.getElementById('modalOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    populateTracks();
+    requestAnimationFrame(refreshTrackDistances);
+
+    document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+    window.addEventListener('resize', refreshTrackDistances);
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    window.addEventListener('load', () => {
+        document.body.classList.remove('is-loading');
+        document.body.classList.add('is-ready');
+        document.getElementById('pageLoader').classList.add('is-hidden');
+    });
+
+    
+    const bgMusic = document.getElementById('bgMusic');
+    let playing = false;
+    bgMusic.volume = 0.6;
+
+    function updateMusicButton(label) {
+        document.getElementById('musicBtn').textContent = label;
+    }
+
+    bgMusic.addEventListener('play', () => {
+        playing = true;
+        updateMusicButton('\u23F8 Pause Music');
+    });
+
+    bgMusic.addEventListener('pause', () => {
+        playing = false;
+        updateMusicButton('\u266B Play Music');
+    });
+
+    function toggleMusic() {
+        if (!bgMusic.paused) {
+            bgMusic.pause();
+            return;
+        }
+
+        const playPromise = bgMusic.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => updateMusicButton('\u266B Play Music'));
+        }
+    }
+
+    // FAQ Accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const item = btn.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            document.querySelectorAll('.faq-item').forEach(other => {
+                other.classList.remove('active');
+                other.querySelector('.faq-answer').style.maxHeight = null;
+            });
+            
+            if (!isActive) {
+                item.classList.add('active');
+                const answer = item.querySelector('.faq-answer');
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        });
+    });
+    </script>
+</body>
+</html>
